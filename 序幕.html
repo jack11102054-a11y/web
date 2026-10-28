@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>序幕</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #121212;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* 正方形容器：2048x2048 比例 */
+    .interactive-wrapper {
+      position: relative;
+      width: 90vw;
+      max-width: 650px;
+      aspect-ratio: 1 / 1;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #000;
+    }
+
+    /* 背景 GIF 圖片層 */
+    .interactive-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 1;
+    }
+
+    /* SVG 點擊互動層：強制提升圖層並確保可以接收點擊事件 */
+    .hotspot-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: auto;
+      z-index: 10;
+    }
+
+    /* 熱點基礎設定：平時完全隱形無框線，僅保留滑鼠指標 */
+    .hotspot {
+      pointer-events: auto;
+      fill: transparent;
+      stroke: none;
+      cursor: pointer;
+    }
+
+    /* 點擊後產生的瞬間光點效果 (持續 0.1 秒) */
+    .click-ripple {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.9);
+      animation: rippleEffect 0.1s linear forwards;
+      z-index: 50;
+    }
+
+    @keyframes rippleEffect {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+      }
+    }
+
+    /* 對話框樣式：15px 字體，黑色背景框，白字 */
+    .dialog-box {
+      position: absolute;
+      bottom: -100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(6px);
+      transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+      opacity: 0;
+      pointer-events: auto;
+      cursor: pointer;
+      white-space: nowrap;
+      z-index: 100;
+    }
+
+    .dialog-box.active {
+      bottom: 30px;
+      opacity: 1;
+    }
+
+    /* 右下角「主頁」按鈕樣式：無背景框，12號字體，透明度30%，緊貼右下雙邊 */
+    .home-button {
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      pointer-events: auto;
+      cursor: pointer;
+      z-index: 60;
+      transition: color 0.2s;
+    }
+
+    .home-button:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="interactive-wrapper" id="wrapper">
+    <!-- 背景動態 GIF 檔案 -->
+    <img src="序幕動畫.gif" alt="序幕背景動畫" class="interactive-image">
+
+    <!-- viewBox 設定為 2048 2048，精準對齊像素 -->
+    <!-- 優先權排序：由上到下，越下面權重越高（人物系列排在最下方，擁有最高優先權） -->
+    <svg class="hotspot-svg" viewBox="0 0 2048 2048" preserveAspectRatio="none">
+
+      <!-- ==========================================
+           【優先權 1：天空類別 (最低)】
+           ========================================== -->
+      <!-- 天空一號 -->
+      <path class="hotspot" d="M 1508,863 L 372,931 L 68,675 L 3,562 L 3,207 L 24,163 L 68,108 L 129,40 L 174,26 L 228,3 L 1816,6 L 1884,26 L 1949,64 L 1993,105 L 2013,143 L 2041,190 L 2044,644 L 2010,757 Z" data-text="天空，故事背景：一八六七年三月，羅妹號於恆春半島外海觸礁沉沒。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 2：海類別】
+           ========================================== -->
+      <!-- 海一號 -->
+      <path class="hotspot" d="M 351,839 L 1491,835 L 1542,904 L 1519,1221 L 1235,1392 L 938,1443 L 682,1382 L 512,1242 Z" data-text="海：滄海無垠，煙波浩渺，萬里長風不問歸期。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 3：陸地類別】
+           ========================================== -->
+      <!-- 陸地一號 -->
+      <path class="hotspot" d="M 925,1412 L 1034,1378 L 1065,1392 L 1095,1354 L 1143,1375 L 1211,1385 L 1321,1388 L 1385,1382 L 1416,1364 L 1474,1395 L 1645,1426 L 1785,1429 L 2024,1467 L 2044,1481 L 2044,1747 L 2044,1849 L 2031,1887 L 1993,1931 L 1959,1972 L 1911,2003 L 1874,2030 L 1836,2040 L 239,2040 L 167,2023 L 105,1986 L 75,1945 L 34,1904 L 20,1870 L -4,1839 L 3,1801 L 6,1699 L 44,1617 L 839,1423 Z" data-text="陸地：潮退礁盤現，碎磯鋪面。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 4：礁石類別】 (號碼小優先)
+           ========================================== -->
+      <!-- 礁石一號 -->
+      <path class="hotspot" d="M 6,334 L 82,303 L 215,310 L 242,344 L 249,416 L 269,429 L 280,508 L 341,545 L 358,596 L 372,610 L 385,661 L 389,747 L 365,764 L 368,784 L 399,805 L 406,870 L 426,887 L 430,958 L 423,1033 L 440,1054 L 443,1115 L 437,1163 L 460,1177 L 481,1207 L 508,1235 L 512,1269 L 515,1306 L 518,1341 L 536,1364 L 539,1388 L 549,1419 L 563,1450 L 587,1450 L 617,1457 L 658,1470 L 675,1491 L 679,1535 L 682,1569 L 679,1607 L 696,1627 L 713,1644 L 713,1672 L 710,1696 L 594,1706 L 542,1702 L 512,1689 L 491,1696 L 481,1689 L 460,1682 L 443,1696 L 426,1696 L 437,1679 L 416,1672 L 426,1651 L 402,1631 L 382,1614 L 402,1600 L 423,1597 L 409,1586 L 409,1566 L 379,1562 L 396,1542 L 419,1535 L 409,1511 L 426,1501 L 413,1484 L 419,1474 L 406,1453 L 385,1453 L 365,1457 L 368,1436 L 389,1426 L 406,1419 L 392,1405 L 385,1385 L 361,1375 L 351,1354 L 331,1337 L 310,1320 L 327,1310 L 327,1289 L 324,1276 L 300,1286 L 283,1300 L 262,1293 L 242,1293 L 215,1289 L 191,1293 L 163,1300 L 146,1320 L 129,1324 L 119,1310 L 105,1303 L 75,1296 L 24,1283 L 0,1283 L 3,381 Z" data-text="礁石：蒼灰古老，飽經風霜。" onclick="handleClick(event, this)"></path>
+
+      <!-- 礁石二號 -->
+      <path class="hotspot" d="M 484,1003 L 525,1016 L 556,1044 L 556,1071 L 570,1143 L 576,1167 L 628,1194 L 624,1296 L 628,1324 L 682,1317 L 723,1313 L 744,1330 L 768,1354 L 812,1371 L 846,1364 L 904,1371 L 925,1375 L 918,1412 L 935,1436 L 942,1477 L 935,1498 L 908,1528 L 887,1535 L 880,1552 L 897,1556 L 918,1580 L 928,1610 L 931,1672 L 901,1685 L 904,1702 L 880,1716 L 856,1702 L 832,1702 L 805,1716 L 757,1713 L 740,1699 L 720,1709 L 706,1692 L 706,1638 L 689,1631 L 672,1614 L 682,1549 L 669,1470 L 635,1453 L 546,1440 L 542,1375 L 518,1358 L 512,1320 L 512,1255 L 477,1211 L 437,1160 L 440,1129 L 437,1088 L 430,1061 L 454,1074 L 471,1088 L 460,1061 L 443,1044 L 474,1057 L 460,1044 L 477,1040 L 501,1044 L 525,1054 L 522,1044 L 498,1027 L 477,1023 L 460,1006 Z" data-text="礁石：與滄海相連，遼遠壯闊。" onclick="handleClick(event, this)"></path>
+
+      <!-- 礁石三號 -->
+      <path class="hotspot" d="M 983,1399 L 983,1423 L 1027,1423 L 1068,1416 L 1092,1405 L 1123,1402 L 1123,1416 L 1170,1412 L 1218,1409 L 1259,1399 L 1293,1395 L 1344,1399 L 1375,1388 L 1416,1378 L 1433,1405 L 1433,1416 L 1403,1416 L 1382,1409 L 1362,1440 L 1355,1457 L 1375,1474 L 1413,1481 L 1443,1487 L 1464,1481 L 1464,1457 L 1461,1436 L 1474,1419 L 1508,1419 L 1546,1416 L 1577,1419 L 1614,1423 L 1621,1450 L 1631,1477 L 1655,1487 L 1679,1484 L 1706,1484 L 1737,1477 L 1751,1491 L 1785,1501 L 1809,1511 L 1829,1504 L 1839,1487 L 1856,1481 L 1874,1501 L 1884,1521 L 1904,1542 L 1915,1569 L 1952,1573 L 1969,1562 L 1996,1556 L 2020,1559 L 2031,1525 L 2041,1484 L 2044,1320 L 2044,982 L 2041,890 L 2041,791 L 2041,760 L 2013,760 L 1996,774 L 1976,764 L 1949,777 L 1918,794 L 1870,812 L 1850,832 L 1860,856 L 1860,893 L 1850,928 L 1826,982 L 1785,1016 L 1737,1023 L 1706,1030 L 1662,1061 L 1621,1091 L 1590,1126 L 1560,1139 L 1542,1136 L 1539,1170 L 1519,1143 L 1498,1139 L 1457,1136 L 1443,1173 L 1426,1197 L 1416,1225 L 1382,1265 L 1355,1265 L 1317,1265 L 1314,1303 L 1304,1327 L 1280,1306 L 1249,1306 L 1222,1310 L 1198,1303 L 1181,1313 L 1160,1341 L 1147,1371 L 1112,1361 L 1095,1347 L 1082,1368 L 1068,1385 L 1054,1388 L 1030,1378 L 1003,1388 Z" data-text="礁石：巨巖橫臥海隅，斑駁石身。" onclick="handleClick(event, this)"></path>
+
+      <!-- 礁石四號 -->
+      <path class="hotspot" d="M 1143,1351 L 1123,1351 L 1109,1327 L 1082,1324 L 1048,1320 L 1065,1289 L 1068,1252 L 1054,1225 L 1075,1228 L 1109,1214 L 1129,1211 L 1160,1197 L 1194,1184 L 1222,1187 L 1245,1194 L 1242,1170 L 1225,1143 L 1215,1108 L 1232,1091 L 1256,1081 L 1263,1064 L 1293,1078 L 1317,1081 L 1334,1071 L 1351,1074 L 1385,1068 L 1392,1054 L 1372,1037 L 1368,1016 L 1375,951 L 1365,904 L 1406,870 L 1423,870 L 1471,825 L 1505,808 L 1505,774 L 1491,767 L 1495,719 L 1525,685 L 1566,648 L 1577,655 L 1597,644 L 1611,627 L 1624,586 L 1665,583 L 1699,579 L 1717,569 L 1751,600 L 1771,617 L 1778,627 L 1764,665 L 1781,678 L 1809,678 L 1829,665 L 1833,641 L 1856,631 L 1894,620 L 1932,610 L 1976,596 L 2010,607 L 2044,624 L 2041,699 L 2037,753 L 2013,777 L 1915,866 L 1682,1078 L 1583,1146 L 1481,1235 L 1304,1324 L 1177,1341 Z" data-text="礁石：巉巖削立，裂隙縱橫。" onclick="handleClick(event, this)"></path>
+
+      <!-- 礁石五號 -->
+      <path class="hotspot" d="M 1372,883 L 1276,887 L 1259,907 L 1215,904 L 1205,866 L 1170,801 L 1133,812 L 1112,808 L 1048,818 L 979,887 L 989,924 L 1007,934 L 969,934 L 962,948 L 942,982 L 897,1027 L 904,1047 L 901,1068 L 959,1064 L 1003,1064 L 1020,1074 L 1061,1078 L 1095,1074 L 1082,1088 L 1095,1115 L 1123,1129 L 1181,1126 L 1218,1122 L 1235,1153 L 1242,1177 L 1242,1197 L 1215,1180 L 1181,1184 L 1136,1197 L 1116,1218 L 1075,1231 L 1061,1252 L 1058,1303 L 1051,1324 L 1082,1320 L 1112,1320 L 1123,1341 L 1119,1351 L 1133,1364 L 1157,1344 L 1181,1324 L 1406,1310 L 1512,1211 L 1594,1105 L 1467,934 Z" data-text="礁石：蒼黑岩體盤踞岸際，厚重如沉睡千年的巨靈。" onclick="handleClick(event, this)"></path>
+
+      <!-- 礁石六號 (A群) -->
+      <path class="hotspot" d="M 785,1054 L 829,1023 L 863,1016 L 870,1047 L 867,1064 L 836,1064 L 805,1068 Z" data-text="礁石：礁骨森然，橫亙浪間。" onclick="handleClick(event, this)"></path>
+
+      <!-- 礁石六號 (B群) -->
+      <path class="hotspot" d="M 617,1068 L 662,1050 L 699,1054 L 747,1040 L 768,1057 L 785,1088 L 747,1081 L 696,1081 L 648,1078 Z" data-text="礁石：奇巖相倚，形態萬千。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 5：青苔點類別】 (號碼小優先)
+           ========================================== -->
+      <!-- 青苔點一號 -->
+      <path class="hotspot" d="M 542,1310 L 580,1289 L 617,1293 L 645,1276 L 675,1276 L 706,1286 L 723,1303 L 747,1327 L 768,1344 L 792,1361 L 815,1358 L 846,1351 L 884,1358 L 908,1361 L 880,1375 L 846,1382 L 802,1385 L 771,1368 L 737,1354 L 716,1341 L 710,1364 L 658,1364 L 621,1354 L 580,1347 L 553,1341 Z" data-text="苔點：苔痕漫上蒼石，歲月無聲，唯有潮汐往復。" onclick="handleClick(event, this)"></path>
+
+      <!-- 青苔點二號 -->
+      <path class="hotspot" d="M 2024,545 L 1986,549 L 1938,576 L 1877,614 L 1908,624 L 1962,627 L 1993,627 L 2027,637 L 2037,590 Z" data-text="苔點：石衣披覆巖身，風霜為紋，歲月為色。" onclick="handleClick(event, this)"></path>
+
+      <!-- 青苔點三號 -->
+      <path class="hotspot" d="M 1863,876 L 1826,904 L 1795,931 L 1723,975 L 1672,1023 L 1696,1054 L 1768,1054 L 1795,1071 L 1816,1085 L 1867,1071 L 1901,1044 L 1935,1037 L 1921,999 L 1932,969 L 1966,948 L 1993,928 L 2044,890 L 2044,852 L 1993,825 L 1901,852 Z" data-text="苔點：苔華寂寂，無花之名，卻將荒石妝成一方幽景。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 6：雜草類別】 (號碼小優先)
+           ========================================== -->
+      <!-- 雜草一號 -->
+      <path class="hotspot" d="M -7,1259 L 58,1248 L 92,1235 L 105,1262 L 146,1265 L 174,1242 L 204,1225 L 239,1245 L 273,1262 L 201,1276 L 218,1293 L 259,1296 L 300,1296 L 324,1279 L 324,1300 L 320,1324 L 341,1334 L 365,1354 L 385,1378 L 396,1405 L 361,1402 L 341,1409 L 320,1416 L 334,1440 L 361,1429 L 389,1423 L 409,1426 L 385,1440 L 361,1453 L 399,1460 L 416,1470 L 399,1484 L 419,1501 L 426,1518 L 423,1552 L 419,1580 L 426,1603 L 396,1610 L 406,1634 L 423,1655 L 454,1665 L 481,1682 L 474,1709 L 437,1733 L 389,1743 L 358,1733 L 385,1767 L 385,1795 L 399,1825 L 365,1832 L 334,1812 L 307,1795 L 283,1791 L 283,1815 L 228,1812 L 218,1791 L 211,1777 L 184,1784 L 177,1808 L 157,1825 L 116,1812 L 71,1795 L 51,1777 L 17,1781 L 0,1781 L 0,1303 Z" data-text="雜草：根纏頑石，於蒼茫海隅獨自向青。" onclick="handleClick(event, this)"></path>
+
+      <!-- 雜草二號 -->
+      <path class="hotspot" d="M 71,1921 L 102,1839 L 153,1815 L 167,1825 L 187,1808 L 208,1788 L 242,1815 L 256,1832 L 290,1795 L 310,1788 L 320,1808 L 344,1836 L 382,1836 L 396,1815 L 419,1791 L 464,1760 L 477,1716 L 539,1699 L 576,1706 L 604,1747 L 652,1788 L 675,1808 L 720,1808 L 812,1825 L 802,1880 L 792,1979 L 809,2006 L 778,2033 L 682,2047 L 232,2044 L 160,2016 L 102,1979 L 68,1952 Z" data-text="雜草：野草自石縫間探出，細微一抹，為岩岸添了生機。" onclick="handleClick(event, this)"></path>
+
+      <!-- 雜草三號 -->
+      <path class="hotspot" d="M 119,975 L 92,921 L 105,893 L 143,870 L 194,883 L 218,870 L 252,846 L 269,801 L 293,805 L 331,808 L 297,777 L 293,747 L 310,713 L 344,672 L 368,624 L 372,590 L 416,576 L 460,610 L 474,655 L 508,699 L 559,716 L 505,733 L 508,757 L 515,777 L 501,794 L 536,794 L 542,822 L 583,832 L 607,852 L 621,876 L 590,904 L 611,921 L 597,955 L 580,979 L 522,982 L 464,972 L 450,979 L 484,992 L 518,1006 L 539,1023 L 498,1047 L 481,1074 L 440,1085 L 392,1074 L 341,1085 L 351,1105 L 365,1129 L 365,1146 L 334,1180 L 327,1218 L 283,1214 L 242,1180 L 221,1119 L 208,1071 L 187,1044 L 150,1009 Z" data-text="雜草：危石孤青，任潮聲日夜相催，於峭壁之間悄然生長。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 7：船隻類別】
+           ========================================== -->
+      <!-- 船一號 -->
+      <path class="hotspot" d="M 573,760 L 580,702 L 597,702 L 617,732 L 628,746 L 638,732 L 652,739 L 669,760 L 679,770 L 710,777 L 723,790 L 747,807 L 771,821 L 785,825 L 788,842 L 788,862 L 809,872 L 843,893 L 846,903 L 877,900 L 911,893 L 928,896 L 935,910 L 921,927 L 901,941 L 873,947 L 846,954 L 829,958 L 812,982 L 788,999 L 757,1005 L 720,1009 L 689,1012 L 672,1019 L 645,1016 L 597,1016 L 573,1016 L 556,1019 L 546,999 L 518,985 L 501,975 L 529,968 L 522,954 L 532,951 L 546,947 L 553,954 L 580,971 L 576,947 L 570,923 L 600,930 L 597,923 L 604,910 L 600,893 L 590,872 L 590,862 L 597,848 L 607,842 L 600,825 L 590,794 Z" data-text="羅妹號：殘舸觸礁，桅傾帆裂。" onclick="handleClick(event, this)"></path>
+
+      <!-- ==========================================
+           【優先權 8：人物類別 (全畫面最高優先權)】 (號碼小優先)
+           ========================================== -->
+      <!-- 人物一號 -->
+      <path class="hotspot" d="M 1205,1193 L 1259,1203 L 1280,1227 L 1293,1261 L 1310,1309 L 1327,1371 L 1310,1435 L 1283,1473 L 1252,1497 L 1198,1480 L 1157,1425 L 1150,1347 L 1160,1251 Z" data-text="族人：誒，紅毛！" onclick="handleClick(event, this)"></path>
+
+      <!-- 人物二號 -->
+      <path class="hotspot" d="M 1563,1401 L 1594,1388 L 1638,1377 L 1679,1418 L 1710,1466 L 1730,1534 L 1734,1589 L 1696,1627 L 1594,1661 L 1542,1651 L 1498,1613 L 1501,1534 L 1515,1494 Z" data-text="族人：坐著休息。" onclick="handleClick(event, this)"></path>
+
+      <!-- 人物三號 -->
+      <path class="hotspot" d="M 901,1548 L 955,1524 L 993,1534 L 1013,1572 L 1037,1654 L 1048,1712 L 1044,1780 L 1034,1845 L 1000,1913 L 949,1930 L 921,1907 L 887,1821 L 891,1750 L 891,1657 Z" data-text="頭目巴耶林：祖靈在上,保佑我們捍衛龜仔用,不能讓紅毛再來肆虐!" onclick="handleClick(event, this)"></path>
+
+      <!-- 人物四號 -->
+      <path class="hotspot" d="M 611,1442 L 679,1435 L 716,1456 L 754,1507 L 771,1534 L 774,1579 L 771,1603 L 754,1668 L 713,1743 L 679,1777 L 638,1780 L 614,1770 L 600,1705 L 600,1599 L 594,1541 Z" data-text="族人：敵人入侵！" onclick="handleClick(event, this)"></path>
+
+      <!-- 人物五號 -->
+      <path class="hotspot" d="M 604,1108 L 669,1108 L 693,1128 L 713,1200 L 737,1255 L 699,1313 L 662,1316 L 594,1316 L 576,1278 L 580,1224 Z" data-text="族人：好-無-聊-喔......。" onclick="handleClick(event, this)"></path>
+
+    </svg>
+
+    <!-- 右下角「主頁」按鈕 (無背景框，緊貼右下雙邊，12號字體，透明度30%) -->
+    <div class="home-button" onclick="handleHomeClick()">HOME</div>
+
+    <!-- 對話框元件 -->
+    <div id="dialog" class="dialog-box" onclick="closeDialog()"></div>
+  </div>
+
+  <script>
+    let timer = null;
+
+    function handleClick(event, element) {
+      const text = element.getAttribute('data-text');
+      showDialog(text);
+
+      // 產生 0.1 秒的點擊光點回饋
+      createRipple(event);
+    }
+
+    // 產生點擊光點特效的函式
+    function createRipple(event) {
+      const wrapper = document.getElementById('wrapper');
+      const rect = wrapper.getBoundingClientRect();
+      
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+
+      wrapper.appendChild(ripple);
+
+      setTimeout(() => {
+        ripple.remove();
+      }, 100);
+    }
+
+    function showDialog(text) {
+      const dialog = document.getElementById('dialog');
+      dialog.innerText = text;
+      dialog.classList.add('active');
+
+      if (timer) clearTimeout(timer);
+
+      // 3 秒後自動隱藏對話框
+      timer = setTimeout(() => {
+        closeDialog();
+      }, 3000);
+    }
+
+    function closeDialog() {
+      const dialog = document.getElementById('dialog');
+      dialog.classList.remove('active');
+    }
+
+    // 主頁按鈕點擊事件：跳轉至首頁
+    function handleHomeClick() {
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>
