@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>尾聲（三）</title>
   <style>
+    /* 移除手機與平板點擊時出現的藍色/灰色高亮邊框 */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -199,8 +204,7 @@
       <!-- ==========================================
            【優先權 12：人物類別 (最高)】 (號碼小優先)
            ========================================== -->
-      <path class="hotspot" d="M 1061,1043 L 1095,1046 L 1119,1050 L 1129,1084 L 1136,1111 L 1133,1149 L 1133,1200 L 1126,1241 L 1109,1265 L 1078,1265 L 1061,1210 L 1054,1162 L 1054,1108 Z" data-text="李讓禮：How can we move forward from here?"
-" onclick="handleClick(event, this)"></path>
+      <path class="hotspot" d="M 1061,1043 L 1095,1046 L 1119,1050 L 1129,1084 L 1136,1111 L 1133,1149 L 1133,1200 L 1126,1241 L 1109,1265 L 1078,1265 L 1061,1210 L 1054,1162 L 1054,1108 Z" data-text="李讓禮：How can we move forward from here?" onclick="handleClick(event, this)"></path>
       <path class="hotspot" d="M 1133,1029 L 1160,1012 L 1184,1022 L 1205,1050 L 1194,1081 L 1222,1104 L 1232,1132 L 1208,1125 L 1201,1156 L 1211,1186 L 1198,1227 L 1136,1224 L 1136,1179 L 1140,1145 L 1129,1118 L 1126,1074 Z" data-text="漢人翻譯：他問你們下一步要怎麼做？" onclick="handleClick(event, this)"></path>
       <path class="hotspot" d="M 1211,1261 L 1242,1244 L 1269,1241 L 1286,1251 L 1304,1282 L 1297,1326 L 1300,1350 L 1307,1401 L 1297,1429 L 1307,1459 L 1286,1490 L 1239,1494 L 1232,1453 L 1225,1432 L 1198,1401 L 1205,1319 Z" data-text="族人：我不知道。" onclick="handleClick(event, this)"></path>
       <path class="hotspot" d="M 1310,1217 L 1334,1193 L 1358,1176 L 1375,1183 L 1385,1193 L 1392,1214 L 1396,1248 L 1375,1258 L 1389,1265 L 1399,1289 L 1403,1316 L 1406,1340 L 1403,1364 L 1385,1367 L 1389,1391 L 1389,1422 L 1372,1453 L 1334,1449 L 1314,1401 L 1307,1371 L 1300,1319 L 1310,1289 L 1324,1275 Z" data-text="族人：頭目覺得呢？" onclick="handleClick(event, this)"></path>
@@ -265,7 +269,7 @@
       dialog.classList.remove('active');
     }
 
- // 主頁按鈕點擊事件：跳轉至首頁
+    // 主頁按鈕點擊事件：跳轉至首頁
     function handleHomeClick() {
       window.location.href = 'index.html';
     }

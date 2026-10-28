@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>村落</title>
   <style>
+    /* 移除手機與平板點擊時出現的藍色/灰色高亮邊框 */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
       padding: 0;
@@ -265,7 +270,7 @@
       }, 100);
     }
 
-    function showDialog(text) {
+    fn showDialog(text) {
       const dialog = document.getElementById('dialog');
       dialog.innerText = text;
       dialog.classList.add('active');
